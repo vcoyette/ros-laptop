@@ -1,0 +1,11 @@
+<launch>
+
+  <group ns="$(arg veh)">  
+  
+    <node pkg="my_package" type="actor_node.py" name="actor"  output="screen" args="$(find my_package)/resources" >
+      <remap from="~image/compressed" to="/$(arg veh)/camera/image/compressed"/>
+    </node>
+
+  </group>
+   
+</launch>
