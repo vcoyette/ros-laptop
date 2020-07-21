@@ -4,4 +4,4 @@ set -e
 
 # YOUR CODE BELOW THIS LINE
 # ----------------------------------------------------------------------------
-roslaunch my_package multiple_nodes.launch veh:=mobyduck
+roslaunch app multiple_nodes.launch veh:=mobyduck

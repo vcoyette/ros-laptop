@@ -2,7 +2,7 @@
 
   <group ns="$(arg veh)">  
   
-    <node pkg="my_package" type="actor_node.py" name="actor"  output="screen" args="$(find my_package)/resources" >
+    <node pkg="app" type="controller_node.py" name="controller"  output="screen" args="$(find app)/resources" >
       <remap from="~image/compressed" to="/$(arg veh)/camera/image/compressed"/>
     </node>
 
