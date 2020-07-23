@@ -5,6 +5,10 @@
     <node pkg="app" type="controller_node.py" name="controller"  output="screen" args="$(find app)/resources" >
       <remap from="~image/compressed" to="/$(arg veh)/camera/image/compressed"/>
     </node>
+    <node pkg="app" type="writer_node.py" name="writer" output="screen" >
+      <remap from="~image/compressed" to="/$(arg veh)/camera/image/compressed"/>
+      <remap from="~save_cmd" to="/$(arg veh)/controller/save_cmd"/>
+    </node>
 
   </group>
    

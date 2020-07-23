@@ -59,7 +59,7 @@ LABEL org.duckietown.label.code.version.major "${MAJOR}"
 LABEL org.duckietown.label.base.image "${BASE_IMAGE}:${BASE_TAG}"
 # <== Do not change this code
 # <==================================================
-ENV ROS_MASTER_URI "http://192.168.1.13:11311/"
+ENV ROS_MASTER_URI "http://192.168.43.99:11311/"
 
 # maintainer
 LABEL maintainer="<YOUR_FULL_NAME> (<YOUR_EMAIL_ADDRESS>)"

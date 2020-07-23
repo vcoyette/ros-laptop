@@ -4,6 +4,7 @@
 import os
 import rospy
 from sensor_msgs.msg import CompressedImage
+from std_msgs.msg import Int16
 import numpy as np
 import cv2
 from app.msg import WheelsSpeed
@@ -12,13 +13,14 @@ from utils.application import DuckieControlApp
 import sys
 
 
-class ControllerNode:
+class ControllerNode(object):
     """Controller Node for the duckiebot.
 
     The control is done through a pygame interface defined in DuckieControlApp.
 
     Subscribe to ~image/compressed to receive image from the camera.
     Publish to ~velocities to publish the Wheels velocities command.
+    Publish to ~save_cmd to send save commands to writer node.
     """
 
     def __init__(self, node_name, resources_path):
@@ -34,8 +36,9 @@ class ControllerNode:
         # Init pygame app
         self.app = DuckieControlApp()
 
-        # Register publisher and subscriber
-        self.pub = rospy.Publisher("~velocities", WheelsSpeed, queue_size=10)
+        # Register publishers and subscriber
+        self.pub_velocities = rospy.Publisher("~velocities", WheelsSpeed, queue_size=10)
+        self.pub_save_cmd = rospy.Publisher("~save_cmd", Int16, queue_size=1)
         self.sub = rospy.Subscriber("~image/compressed", CompressedImage, self.callback)
 
         # Init Autopilote
@@ -70,7 +73,7 @@ class ControllerNode:
 
             # Convert to WheelsSpeed msg and publish
             s = self.get_wheels_speed(action)
-            self.pub.publish(s)
+            self.pub_velocities.publish(s)
 
             # Send speed info to display
             self.app.register_action(action)
@@ -85,17 +88,21 @@ class ControllerNode:
 
         while not rospy.is_shutdown():
             # Run a step on the app, to get the action from keyboard
-            action, autopilote_toggle = self.app.step(self.auto_pilote_mode)
+            action, autopilote_toggle, save_cmd = self.app.step(self.auto_pilote_mode)
 
             # If an action is returned by app.step,
             # i.e. if self.auto_pilote_mode was True
             if action:
                 s = self.get_wheels_speed(action)
-                self.pub.publish(s)
+                self.pub_velocities.publish(s)
 
             # Toggle autopilote if prompted by the user
             if autopilote_toggle:
                 self.auto_pilote_mode = not self.auto_pilote_mode
+
+            # Save a 500 timesteps episodes if prompted
+            if save_cmd:
+                self.pub_save_cmd.publish(500)
 
             # Sleep until next step
             rate.sleep()

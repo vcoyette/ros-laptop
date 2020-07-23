@@ -76,13 +76,16 @@ class DuckieControlApp(object):
         pygame.event.pump()
 
         autopilote_toggle = False
+        save_cmd = False
 
         # If A have been pressed once, toggle autopilote
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
                 autopilote_toggle = True
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                save_cmd = True
 
-        return action, autopilote_toggle
+        return action, autopilote_toggle, save_cmd
 
     def render(self):
         """Render display."""
