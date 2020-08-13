@@ -57,17 +57,17 @@ class DuckieControlApp(object):
             # Default if no key is pressed
             action = [0, 0]
             if keys[pygame.K_UP]:
-                action[0] = 0.44
-                action[1] = 0.44
+                action[0] = 0.6
+                action[1] = 0.6
             if keys[pygame.K_DOWN]:
-                action[0] = -0.44
-                action[1] = -0.44
+                action[0] = -0.6
+                action[1] = -0.6
             if keys[pygame.K_LEFT]:
-                action[0] = 0.34
-                action[1] = 0.46
+                action[0] = 0.24
+                action[1] = 0.86
             if keys[pygame.K_RIGHT]:
-                action[0] = 0.46
-                action[1] = 0.34
+                action[0] = 0.86
+                action[1] = 0.24
 
             # Register action to display
             self.register_action(action)
