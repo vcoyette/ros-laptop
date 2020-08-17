@@ -1,6 +1,6 @@
 .PHONY: build run
 
-CONTAINER_NAME := ros-laptop
+CONTAINER_NAME := ros-laptop2
 VERSION := v1
 
 build:
