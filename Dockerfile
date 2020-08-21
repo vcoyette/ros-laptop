@@ -1,27 +1,34 @@
-# Dockerfile for ros-laptop
-
-# Base image
-ARG OS=ubuntu
-ARG DISTRO=focal
-ARG ARCH=amd64
-
-FROM ${ARCH}/${OS}:${DISTRO}
+FROM ros:melodic 
 
 RUN apt-get update && apt-get install -y \
-    build-essential
+    python3-pip \
+    python-catkin-tools \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install ROS (http://wiki.ros.org/noetic/Installation/Ubuntu)
-RUN apt-key adv \
-    --keyserver hkp://keyserver.ubuntu.com:80 \
-    --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-RUN echo "deb http://packages.ros.org/ros/ubuntu focal main" > /etc/apt/sources.list.d/ros-latest.list
+# Create Catkin workspace
+ENV CATKIN_WS_DIR=/code/catkin_ws
+WORKDIR ${CATKIN_WS_DIR}
 
-RUN apt-get update && apt-get install -y \
-    ros-noetic-rospy \
-    ros-noetic-robot \
-    ros-noetic-cv-bridge
+# Upgrade pip
+RUN pip3 install --upgrade pip
 
+# install python dependencies
+COPY ./dependencies-py.txt .
+RUN pip3 install -r dependencies-py.txt
 
-# Create and set workspace
-WORKDIR /workspace
+# copy the source code
+COPY . ./src
 
+# build packages
+RUN . /opt/ros/melodic/setup.sh && \
+  catkin build
+
+# define command
+CMD ["bash", "-c", "./src/launch.sh"]
+
+ARG hostname
+
+# store module name
+ENV ROS_MASTER_URI "http://192.168.43.99:11311/"
+# ENV ROS_HOSTNAME ${hostname}
+ENV ROS_IP 192.168.43.228

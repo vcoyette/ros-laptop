@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """A Node to control the duckiebot via the computer through keyboard or autopilote."""
 
 import os
