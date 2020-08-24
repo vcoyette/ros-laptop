@@ -5,9 +5,11 @@ import os
 import rospy
 import cv2
 import numpy as np
+from app.msg import WheelsSpeed
 from std_msgs.msg import Int16
 from sensor_msgs.msg import CompressedImage
 import PIL.Image as Image
+from threading import Lock
 
 EPISODE_REGEXP = "episode_{:02}"
 IMG_TEMPLATE = "image_{:04}.png"
@@ -19,6 +21,7 @@ class WriterNode(object):
 
     Subscribe to ~save_cmd to receive the command to save an episode.
     Subscribe to ~image/compressed when the saving of an episode is being performed.
+    Subscribe to ~velocities when the saving of an episode is being performed.
 
     !!Requires Docker to be ran mounting /transfer folder with --volume option.
     """
@@ -39,8 +42,14 @@ class WriterNode(object):
         self.episode = 0
         self.folder = os.path.join(ROOT_FOLDER, EPISODE_REGEXP.format(self.episode))
 
-        # Init image list
+        # Init image and action list
         self.images = []
+        self.actions = []
+
+        # Init sample saving lock.
+        # It is used to save an action per image exactly: when an image is saved,
+        # The lock is acquired, then an action is saved and the lock is released.
+        self.sample_lock = Lock()
 
     def save_episode(self, data):
         """Callback on save cmd receive.
@@ -60,12 +69,15 @@ class WriterNode(object):
 
         os.makedirs(self.folder)
 
-        # Register a subscriber to image topic
-        self.image_sub = rospy.Subscriber(
-            "~image/compressed", CompressedImage, self.register_images
+        # Register subscribers to image and velocities topics
+        self.images_sub = rospy.Subscriber(
+            "~image/compressed", CompressedImage, self.register_image
+        )
+        self.actions_sub = rospy.Subscriber(
+            "~velocities", WheelsSpeed, self.register_action
         )
 
-    def register_images(self, data):
+    def register_image(self, data):
         """Callback on image receiving.
 
         Args:
@@ -73,16 +85,14 @@ class WriterNode(object):
         """
         print("Saving image...", len(self.images))
 
+        # Acquire the sample lock
+        self.sample_lock.acquire()
+
         # If episode is finished
         if len(self.images) >= self.episode_length:
             # Unsubscribes from ~image/compressed
             self.image_sub.unregister()
-
-            # Actually write images on disk
-            self.save_images()
-
-            # Update episode counter
-            self.episode += 1
+            return
 
         # Load image from topic
         np_arr = np.fromstring(data.data, np.uint8)
@@ -94,10 +104,38 @@ class WriterNode(object):
         # Add to image list
         self.images.append(image)
 
-    def save_images(self):
-        """Save images on disk."""
+    def register_action(self, action):
+        """Callback on action receiving.
+
+        Args:
+            data: compressed image from the camera.
+        """
+        # If a sample is being saved, i.e. if an image has just been saved
+        if self.sample_lock.locked():
+            if len(self.actions) >= self.episode_length:
+                # Unsubscribes from ~velocities
+                self.actions_sub.unregister()
+
+                # Actually write the episode on disk
+                self.write_episode()
+
+                # Update episode counter
+                self.episode += 1
+
+                return
+
+            self.actions.append(action)
+
+            # Release the lock
+            self.sample_lock.release()
+
+    def write_episode(self):
+        """Write episode on disk."""
         print("Writing images on disk...")
-        for i, image in enumerate(self.images):
+
+        # Build annotations
+        annotations = []
+        for i, (image, action) in enumerate(zip(self.images, self.actions)):
             # Create filename
             filename = IMG_TEMPLATE.format(i)
 
@@ -107,9 +145,20 @@ class WriterNode(object):
             # Save
             img.save(os.path.join(self.folder, filename))
 
+            annotations.append([filename, action.left, action.right])
+
+        self.write_annotations(annotations)
+
         print("Done saving episode")
         # Reinit images list
         self.images = []
+        self.actions = []
+
+    def write_annotations(self, annotations):
+        """Wrie annotations."""
+        with open(os.path.join(self.folder, "annotation.txt"), "w") as f:
+            for a in annotations:
+                f.write("{} {} {}\n".format(*a))
 
 
 if __name__ == "__main__":

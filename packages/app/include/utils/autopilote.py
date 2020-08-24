@@ -21,7 +21,9 @@ class AutoPilote:
             shape (Tuple[int], optional): Shape of an image in the stack.
         """
         self._actor = Actor(2, 1)
-        self._actor.load_state_dict(torch.load(weights_path))
+        self._actor.load_state_dict(
+            torch.load(weights_path, map_location=torch.device("cpu"))
+        )
         self._stack = deque(maxlen=num_stack)
         self._num_stack = num_stack
         self._shape = shape
