@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """Autopilote, using Imitation learning."""
 
-from utils.model import Actor
+from utils.feature_extractor import FeatureExtractor
+from utils.classifier import Classifier
+from utils.dwt import DWTModel
 import torch
 from collections import deque
 import cv2
@@ -20,10 +22,12 @@ class AutoPilote:
             num_stack (int, optional): Number of images to stack in a state.
             shape (Tuple[int], optional): Shape of an image in the stack.
         """
-        self._actor = Actor(2, 1)
+        self._actor = DWTModel(FeatureExtractor(), Classifier(2, 1))
         self._actor.load_state_dict(
             torch.load(weights_path, map_location=torch.device("cpu"))
         )
+        self._actor.eval()
+
         self._stack = deque(maxlen=num_stack)
         self._num_stack = num_stack
         self._shape = shape
@@ -32,7 +36,7 @@ class AutoPilote:
         """Return the action to perform based on current stack."""
         state = torch.FloatTensor(self._stack)
         state = state.unsqueeze(0)
-        return self._actor(state).detach().numpy().flatten()
+        return self._actor(state, target=1).detach().numpy().flatten()
 
     def add_to_stack(self, image):
         """Add an image to the state stack."""
