@@ -91,7 +91,7 @@ class WriterNode(object):
         # If episode is finished
         if len(self.images) >= self.episode_length:
             # Unsubscribes from ~image/compressed
-            self.image_sub.unregister()
+            self.images_sub.unregister()
             return
 
         # Load image from topic
@@ -110,6 +110,7 @@ class WriterNode(object):
         Args:
             data: compressed image from the camera.
         """
+
         # If a sample is being saved, i.e. if an image has just been saved
         if self.sample_lock.locked():
             if len(self.actions) >= self.episode_length:

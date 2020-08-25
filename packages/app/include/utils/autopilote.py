@@ -10,7 +10,7 @@ import cv2
 class AutoPilote:
     """Class defining the auto pilote behaviour."""
 
-    def __init__(self, weights_path, num_stack=4, shape=(60, 80)):
+    def __init__(self, weights_path, num_stack=4, shape=(80, 60)):
         """Initialise AutoPilote.
 
         [TODO:description]

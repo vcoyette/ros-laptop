@@ -7,6 +7,7 @@
     </node>
     <node pkg="app" type="writer_node.py" name="writer" output="screen" >
       <remap from="~image/compressed" to="/$(arg veh)/camera/image/compressed"/>
+      <remap from="~velocities" to="/$(arg veh)/controller/velocities"/>
       <remap from="~save_cmd" to="/$(arg veh)/controller/save_cmd"/>
     </node>
 
