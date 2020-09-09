@@ -59,3 +59,8 @@ class AutoPilote:
         """Fill the stack with image."""
         for _ in range(self._num_stack):
             self._stack.append(image)
+
+    @property
+    def stack(self):
+        """Get the stack."""
+        return self._stack

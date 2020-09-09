@@ -66,7 +66,7 @@ class ControllerNode(object):
 
         # Send data to the app, to display
         self.app.register_image(image)
-        self.app.register_stack(self.auto_pilote._stack)
+        self.app.register_stack(self.auto_pilote.stack)
 
         # If autopilote is activated
         if self.auto_pilote_mode:
