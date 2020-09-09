@@ -39,3 +39,19 @@ You need to allow docker to access your X server. You can run:
 xhost +"local:docker@"
 ```
 
+## UML
+
+Here is a sequence diagram presenting each ros node and topics.
+The infinite loop is launched on startup. If the user press enter, the episode saving loop is launched for 500 timesteps. The only difference is the 
+
+``` plantuml
+== Infinite Loop ==
+camera_node -> controller_node: image/compressed
+controller_node -> motor_node: velocities  
+ 
+== Episode saving ==
+controller_node -> writer_node: save_cmd
+camera_node -> controller_node: image/compressed
+camera_node -> writer_node: image/compressed
+controller_node -> motor_node: velocities  
+```
