@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 """UI definition for the application."""
 
-import numpy as np
-import pygame
 import cv2
+import numpy as np
+
+import pygame
 from app.msg import WheelsSpeed
 
 # Screen definition
@@ -49,7 +50,7 @@ class Display(object):
         1. The image from the camera.
         2. The stack of grayscale images in agent state.
         3. A bar on which an indicator shows if the robot turns left or right.
-     """
+    """
 
     def __init__(self):
         """Initialise display."""

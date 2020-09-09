@@ -1,5 +1,6 @@
 FROM ros:melodic 
 
+# Install apt dependencies
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python-catkin-tools \
@@ -26,9 +27,6 @@ RUN . /opt/ros/melodic/setup.sh && \
 # define command
 CMD ["bash", "-c", "./src/launch.sh"]
 
-ARG hostname
-
-# store module name
-ENV ROS_MASTER_URI "http://192.168.43.99:11311/"
-# ENV ROS_HOSTNAME ${hostname}
+ENV ROS_MASTER_IP 192.168.43.99
+ENV ROS_MASTER_URI "http://$ROS_MASTER_IP:11311/"
 ENV ROS_IP 192.168.43.228
