@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 """Autopilote, using Imitation learning."""
 
-from utils.model import Actor
-import torch
 from collections import deque
+
 import cv2
+import torch
+
+from utils.model import Actor
 
 
 class AutoPilote:

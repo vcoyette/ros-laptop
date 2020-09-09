@@ -5,7 +5,6 @@ import cv2
 import numpy as np
 
 import pygame
-from app.msg import WheelsSpeed
 
 # Screen definition
 SCREEN_W = 860

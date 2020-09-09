@@ -2,15 +2,17 @@
 """A Node to control the duckiebot via the computer through keyboard or autopilote."""
 
 import os
+import sys
+
+import cv2
+import numpy as np
+
 import rospy
+from app.msg import WheelsSpeed
 from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import Int16
-import numpy as np
-import cv2
-from app.msg import WheelsSpeed
-from utils.autopilote import AutoPilote
 from utils.application import DuckieControlApp
-import sys
+from utils.autopilote import AutoPilote
 
 
 class ControllerNode(object):

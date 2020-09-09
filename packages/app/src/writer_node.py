@@ -2,14 +2,16 @@
 """A Node to write images to disk."""
 
 import os
-import rospy
+from threading import Lock
+
 import cv2
 import numpy as np
-from app.msg import WheelsSpeed
-from std_msgs.msg import Int16
-from sensor_msgs.msg import CompressedImage
 import PIL.Image as Image
-from threading import Lock
+
+import rospy
+from app.msg import WheelsSpeed
+from sensor_msgs.msg import CompressedImage
+from std_msgs.msg import Int16
 
 EPISODE_REGEXP = "episode_{:02}"
 IMG_TEMPLATE = "image_{:04}.png"
